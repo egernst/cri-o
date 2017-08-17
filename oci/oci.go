@@ -76,22 +76,30 @@ func (r *Runtime) Name() string {
 // Depending if the container is privileged and/or trusted,
 // this will return either the trusted or untrusted runtime path.
 func (r *Runtime) Path(c *Container) string {
+	logrus.Warnf("EERNST: calling path")
 	if !c.trusted {
+
+		logrus.Warnf("EERNST: dealing with an untrusted container")
 		// We have an explicitly untrusted container.
 		if c.privileged {
 			logrus.Warnf("Running an untrusted but privileged container")
 			return r.trustedPath
 		}
 
+		logrus.Warnf("EERNST: untrusted c, not privileged")
 		if r.untrustedPath != "" {
+			logrus.Warnf("EERNST: untrusted c, not privileged- we have an untrusted runtime defined")
 			return r.untrustedPath
 		}
+			logrus.Warnf("EERNST: untrusted c, not privileged, but we don't have an untrusted runtime defined")
 
 		return r.trustedPath
 	}
 
+	logrus.Warnf("EERNST: dealing with a trusted container")
 	// Our container is trusted. Let's look at the configured trust level.
 	if r.trustLevel == "trusted" {
+		logrus.Warnf("EERNST: dealing with a trusted container with a trusted runtime")
 		return r.trustedPath
 	}
 
@@ -99,9 +107,11 @@ func (r *Runtime) Path(c *Container) string {
 	// We will use the untrusted container runtime if it's set
 	// and if it's not a privileged container.
 	if c.privileged || r.untrustedPath == "" {
+		logrus.Warnf("EERNST: dealing with a trusted container but it is request priv, or we don't have untrusted path")
 		return r.trustedPath
 	}
 
+	logrus.Warnf("EERNST: final clause - using untrusted path: %s", r.untrustedPath)
 	return r.untrustedPath
 }
 
